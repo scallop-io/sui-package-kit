@@ -1,0 +1,56 @@
+{
+  "name": "@scallop-dao/sui-package-kit",
+  "author": "scallop-io",
+  "version": "0.32.1",
+  "description": "Tookit for publish/upgrade/build SUI packages",
+  "keywords": [
+    "sui",
+    "scallop-io",
+    "move",
+    "blockchain",
+    "package"
+  ],
+  "license": "Apache-2.0",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "publish": "npm run clean && npm run build && npm publish --registry https://registry.npmjs.org",
+    "clean": "rm -rf tsconfig.tsbuildinfo ./dist",
+    "build": "npm run build:types && npm run build:tsup",
+    "build:tsup": "tsup ./src/index.ts --format esm,cjs --sourcemap",
+    "build:types": "tsc --build"
+  },
+  "dependencies": {
+    "@mysten/sui.js": "^0.32.1",
+    "colorts": "^0.1.63",
+    "superstruct": "^1.0.3",
+    "tmp": "^0.2.1"
+  },
+  "devDependencies": {
+    "@scallop-dao/sui-kit": "^0.32.1",
+    "@types/node": "^18.15.11",
+    "@types/tmp": "^0.2.3",
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.2"
+  }
+}
