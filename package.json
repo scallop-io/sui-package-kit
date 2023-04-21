@@ -45,7 +45,7 @@
     "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "@scallop-dao/sui-kit": "^0.32.1",
+    "@scallop-dao/sui-kit": "^0.32.8",
     "@types/node": "^18.15.11",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",
