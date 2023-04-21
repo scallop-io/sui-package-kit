@@ -4,6 +4,7 @@ import {
   fromB64,
   RawSigner,
   getExecutionStatusType,
+  SuiTransactionBlockResponse,
 } from "@mysten/sui.js";
 import {parsePublishTxn} from './sui-response-parser';
 import { BuildOptions, defaultBuildOptions, buildPackage } from './build-package'
@@ -14,17 +15,23 @@ export type PublishOptions = BuildOptions & {
 } 
 const defaultPublishOptions: PublishOptions = {
   ...defaultBuildOptions,
-  gasBudget: 10**8,
+  gasBudget: 10**9,
 }
 
+type PublishResult = {
+  packageId: string,
+  upgradeCapId: string,
+  created: { type: string; objectId: string, owner: string }[],
+  publishTxn: SuiTransactionBlockResponse,
+}
 /**
  * Publishes a package to the SUI blockchain, and returns the packageId and publish txn response
  * @param suiBinPath, the path to the sui client binary
  * @param packagePath, the path to the package to be built
  * @param signer, signer who is going the publish the package
- * @returns { packageId, publishTxn }, the packageId and publishTxn
+ * @returns { packageId, upgradeCapId, created, publishTxn }, the packageId, upgradeCapId, created objects and publishTxn
  */
-export const publishPackage = async (suiBinPath: string, packagePath: string, signer: RawSigner, options: PublishOptions = defaultPublishOptions) => {
+export const publishPackage = async (suiBinPath: string, packagePath: string, signer: RawSigner, options: PublishOptions = defaultPublishOptions): Promise<PublishResult> => {
   const gasBudget = options.gasBudget || defaultPublishOptions.gasBudget as number;
 
   // build the package
@@ -66,6 +73,6 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
     return { packageId, publishTxn, created, upgradeCapId };
   } else {
     console.error('Publish package failed!'.red)
-    return { packageId: '', publishTxn };
+    return { packageId: '', publishTxn, created: [], upgradeCapId: '' };
   }
 }

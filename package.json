@@ -1,7 +1,7 @@
 {
   "name": "@scallop-dao/sui-package-kit",
   "author": "scallop-io",
-  "version": "0.32.2",
+  "version": "0.32.3",
   "description": "Tookit for publish/upgrade/build SUI packages",
   "keywords": [
     "sui",
