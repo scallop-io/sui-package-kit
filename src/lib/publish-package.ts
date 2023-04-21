@@ -63,7 +63,7 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
     console.log('==============Package info=============='.gray)
     console.log('PackageId: '.gray, packageId.blue.bold)
     console.log('UpgradeCapId: '.gray, upgradeCapId.blue.bold, '\n')
-    return { packageId, publishTxn };
+    return { packageId, publishTxn, created, upgradeCapId };
   } else {
     console.error('Publish package failed!'.red)
     return { packageId: '', publishTxn };

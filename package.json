@@ -1,7 +1,7 @@
 {
   "name": "@scallop-dao/sui-package-kit",
   "author": "scallop-io",
-  "version": "0.32.1",
+  "version": "0.32.2",
   "description": "Tookit for publish/upgrade/build SUI packages",
   "keywords": [
     "sui",
@@ -45,7 +45,7 @@
     "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "@scallop-dao/sui-kit": "^0.32.8",
+    "@scallop-dao/sui-kit": "^0.32.9",
     "@types/node": "^18.15.11",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",
