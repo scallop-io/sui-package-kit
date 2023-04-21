@@ -18,7 +18,7 @@ const defaultPublishOptions: PublishOptions = {
   gasBudget: 10**9,
 }
 
-type PublishResult = {
+export type PackagePublishResult = {
   packageId: string,
   upgradeCapId: string,
   created: { type: string; objectId: string, owner: string }[],
@@ -31,7 +31,7 @@ type PublishResult = {
  * @param signer, signer who is going the publish the package
  * @returns { packageId, upgradeCapId, created, publishTxn }, the packageId, upgradeCapId, created objects and publishTxn
  */
-export const publishPackage = async (suiBinPath: string, packagePath: string, signer: RawSigner, options: PublishOptions = defaultPublishOptions): Promise<PublishResult> => {
+export const publishPackage = async (suiBinPath: string, packagePath: string, signer: RawSigner, options: PublishOptions = defaultPublishOptions): Promise<PackagePublishResult> => {
   const gasBudget = options.gasBudget || defaultPublishOptions.gasBudget as number;
 
   // build the package
