@@ -23,6 +23,21 @@ export const parsePublishTxn = (suiResponse: SuiTransactionBlockResponse) => {
   return parseRes;
 }
 
+export const parseUpgradeTxn = (suiResponse: SuiTransactionBlockResponse) => {
+  const objectChanges = getObjectChanges(suiResponse);
+  const parseRes = { packageId: '', upgradeCapId: '' };
+  if (objectChanges) {
+    for (const change of objectChanges) {
+      if (change.type === 'published') {
+        parseRes.packageId = change.packageId;
+      } else if (change.objectType === '0x2::package::UpgradeCap') {
+        parseRes.upgradeCapId = change.objectId;
+      }
+    }
+  }
+  return parseRes;
+}
+
 const parseOwnerFromObjectChange = (change: SuiObjectChange) => {
   const sender = change?.sender;
   if (change?.owner?.AddressOwner) {

@@ -1,7 +1,6 @@
 import 'colorts/lib/string';
 import {
   TransactionBlock,
-  fromB64,
   RawSigner,
   getExecutionStatusType,
   SuiTransactionBlockResponse,
@@ -35,7 +34,7 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
   const gasBudget = options.gasBudget || defaultPublishOptions.gasBudget as number;
 
   // build the package
-  const compiledModulesAndDeps = buildPackage(suiBinPath, packagePath, options);
+  const { modules, dependencies } = buildPackage(suiBinPath, packagePath, options);
 
   // create a transaction block for publish package
   const publishTxnBlock = new TransactionBlock();
@@ -44,8 +43,8 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
 
   // obtain the upgradeCap, and transfer it to the publisher
   const upgradeCap = publishTxnBlock.publish({
-    modules: compiledModulesAndDeps.modules.map(m => Array.from(fromB64(m))),
-    dependencies: compiledModulesAndDeps.dependencies,
+    modules,
+    dependencies,
   });
   const publisher = publishTxnBlock.pure(await signer.getAddress());
   publishTxnBlock.transferObjects([upgradeCap], publisher);

@@ -1,7 +1,7 @@
 {
   "name": "@scallop-dao/sui-package-kit",
   "author": "scallop-io",
-  "version": "0.32.4",
+  "version": "0.32.5",
   "description": "Tookit for publish/upgrade/build SUI packages",
   "keywords": [
     "sui",
@@ -39,13 +39,13 @@
     "build:types": "tsc --build"
   },
   "dependencies": {
-    "@mysten/sui.js": "^0.32.1",
+    "@mysten/sui.js": "^0.32.2",
     "colorts": "^0.1.63",
     "superstruct": "^1.0.3",
     "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "@scallop-dao/sui-kit": "^0.32.9",
+    "@scallop-dao/sui-kit": "^0.32.11",
     "@types/node": "^18.15.11",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",

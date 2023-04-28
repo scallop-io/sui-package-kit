@@ -42,17 +42,16 @@ export const buildPackage = (suiBinPath: string, packagePath: string, options: B
     const withUnpublishedDep = options.withUnpublishedDependencies ? '--with-unpublished-dependencies' : '';
     const skipDepFetch = options.skipFetchLatestGitDeps ? '--skip-fetch-latest-git-deps' : '';
     const buildCmd =
-      `${suiBinPath} move build --dump-bytecode-as-base64 --dump-package-digest --path ${packagePath} ${skipDepFetch} ${withUnpublishedDep}`;
+      `${suiBinPath} move build --dump-bytecode-as-base64 --path ${packagePath} ${skipDepFetch} ${withUnpublishedDep}`;
     console.log('Running build package command')
     console.log(buildCmd.cyan.bold)
     const buildCommandOutput = execSync(`${buildCmd} --install-dir ${tmpDir.name}`, {encoding: 'utf-8'});
-    const [modulesAndDeps, digest] = buildCommandOutput.split('\n');
-    const compiledModulesAndDeps = JSON.parse(modulesAndDeps);
+    const { modules, dependencies, digest } = JSON.parse(buildCommandOutput);
     console.log('Build package success'.green)
     return {
-      modules: compiledModulesAndDeps.modules,
-      dependencies: compiledModulesAndDeps.dependencies.map((dependencyId: string) => normalizeSuiObjectId(dependencyId)),
-      digest: digest,
+      modules,
+      dependencies,
+      digest,
     } as BuildPackageResult;
   } catch (e) {
     console.error('Build package failed!'.red);
