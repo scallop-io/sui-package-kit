@@ -1,8 +1,6 @@
 // @ts-nocheck
 import {SuiTransactionBlockResponse, getObjectChanges, SuiObjectChange} from "@mysten/sui.js";
 
-const UPGRADE_CAP_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::package::UpgradeCap';
-
 export const parsePublishTxn = (suiResponse: SuiTransactionBlockResponse) => {
   const objectChanges = getObjectChanges(suiResponse);
   const parseRes = {
@@ -12,7 +10,7 @@ export const parsePublishTxn = (suiResponse: SuiTransactionBlockResponse) => {
   }
   if (objectChanges) {
     for (const change of objectChanges) {
-      if (change.type === 'created' && change.objectType === UPGRADE_CAP_TYPE) {
+      if (change.type === 'created' && change.objectType.endsWith('package::UpgradeCap')) {
         parseRes.upgradeCapId = change.objectId;
       } else if (change.type === 'published') {
         parseRes.packageId = change.packageId;
@@ -32,7 +30,7 @@ export const parseUpgradeTxn = (suiResponse: SuiTransactionBlockResponse) => {
     for (const change of objectChanges) {
       if (change.type === 'published') {
         parseRes.packageId = change.packageId;
-      } else if (change.objectType === UPGRADE_CAP_TYPE) {
+      } else if (change.objectType.endsWith('package::UpgradeCap')) {
         parseRes.upgradeCapId = change.objectId;
       }
     }
