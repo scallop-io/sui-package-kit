@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@iarna/toml':
+    specifier: ^2.2.5
+    version: 2.2.5
   '@mysten/sui.js':
     specifier: ^0.33.0
     version: 0.33.0
@@ -242,6 +245,10 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@iarna/toml@2.2.5:
+    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+    dev: false
 
   /@mysten/bcs@0.7.1:
     resolution: {integrity: sha512-wFPb8bkhwrbiStfZMV5rFM7J+umpke59/dNjDp+UYJKykNlW23LCk2ePyEUvGdb62HGJM1jyOJ8g4egE3OmdKA==}
