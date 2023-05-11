@@ -1,6 +1,6 @@
 {
   "name": "@scallop-io/sui-package-kit",
-  "version": "0.33.2",
+  "version": "0.33.3",
   "description": "Tookit for publish/upgrade/build SUI packages",
   "keywords": [
     "sui",
