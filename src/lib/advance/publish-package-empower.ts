@@ -48,7 +48,7 @@ export const publishPackageEmpower = async (
     }
     if (objectIdsParser) {
       const objIds = objectIdsParser(res);
-      writeAsJson(objIds, path.join(pkgPath, `ids.${networkType}.json`));
+      writeAsJson(objIds, path.join(pkgPath, `object-ids.${networkType}.json`));
     }
     return res;
   } else {
