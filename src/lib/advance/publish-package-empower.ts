@@ -48,7 +48,8 @@ export const publishPackageEmpower = async (
     }
     if (publishResultParser) {
       const parsedPublishResult = publishResultParser(res);
-      writeAsJson(parsedPublishResult, path.join(pkgPath, `publish-result.${networkType}.json`));
+      const defaultPublishResult = { packageId: res.packageId, upgradeCapId: res.upgradeCapId };
+      writeAsJson({ ...defaultPublishResult, ...parsedPublishResult }, path.join(pkgPath, `publish-result.${networkType}.json`));
     }
     return res;
   } else {

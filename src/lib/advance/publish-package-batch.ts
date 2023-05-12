@@ -36,8 +36,13 @@ export const publishPackageBatch = async (
 
 const normalizePackageBatch = (packageBatch: PackageBatch) => {
   return packageBatch.map((pkg) => {
-    const defaultOption: PublishPackageOption = { enforce: false, writeToml: true, publishResultParser: defaultPublishResultParser }
-    return { packagePath: pkg.packagePath, option: pkg.option || defaultOption }
+    const option: PublishPackageOption = {
+      enforce: false,
+      writeToml: true,
+      publishResultParser: () => ({}),
+      ...pkg.option
+    };
+    return { packagePath: pkg.packagePath, option }
   })
 }
 
@@ -75,4 +80,3 @@ const restoreMoveToml = (pkgPath: string) => {
   fs.cpSync(backupMoveTomlPath, path.join(pkgPath, "Move.toml"));
   fs.rmSync(backupMoveTomlPath);
 }
-
