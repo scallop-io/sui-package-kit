@@ -36,12 +36,12 @@ export const publishPackageBatch = async (
 
 const normalizePackageBatch = (packageBatch: PackageBatch) => {
   return packageBatch.map((pkg) => {
-    const defaultOption: PublishPackageOption = { enforce: false, writeToml: true, objectIdsParser: defaultObjectIdsParser }
+    const defaultOption: PublishPackageOption = { enforce: false, writeToml: true, publishResultParser: defaultPublishResultParser }
     return { packagePath: pkg.packagePath, option: pkg.option || defaultOption }
   })
 }
 
-const defaultObjectIdsParser = (publishResult: PackagePublishResult) => {
+const defaultPublishResultParser = (publishResult: PackagePublishResult) => {
   const packageId = publishResult.packageId;
   const upgradeCapId = publishResult.upgradeCapId;
   return { packageId, upgradeCapId }

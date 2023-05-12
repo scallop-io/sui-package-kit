@@ -3,13 +3,13 @@
  */
 import * as path from "path";
 import * as dotenv from "dotenv";
-import { SuiKit } from "@scallop-dao/sui-kit";
+import { SuiKit } from "@scallop-io/sui-kit";
 import { SuiPackagePublisher } from "../src";
 dotenv.config();
 
 (async() => {
   const secretKey = process.env.SECRET_KEY;
-  const suiKit = new SuiKit({ secretKey, networkType: 'localhost' });
+  const suiKit = new SuiKit({ secretKey, networkType: 'devnet' });
 
   const packagePath = path.join(__dirname, './sample_move/package_a');
   const publisher = new SuiPackagePublisher();

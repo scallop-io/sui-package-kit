@@ -7,14 +7,14 @@ import type { PackagePublishResult } from "../publish-package"
 import { parseMoveToml, writeMoveToml } from "./toml";
 import { writeAsJson } from './write-as-json'
 
-export type ObjectIdsParser = (publishResult: PackagePublishResult) => Record<string, any>;
+export type PublishResultParser = (publishResult: PackagePublishResult) => Record<string, any>;
 export type PublishPackageOption = {
   // if true, the package will be published even if it's already published for the networkType
   enforce?: boolean
   // if true, it will write a `Move.${networkType}.toml` file for the package
   writeToml?: boolean
-  // if true, it will write a `Move.${networkType}.json` file with the parsed objectIds
-  objectIdsParser?: ObjectIdsParser
+  // if true, it will write a `publish-result.${networkType}.json` file with the parsed objectIds
+  publishResultParser?: PublishResultParser
 }
 
 /**
@@ -26,18 +26,18 @@ export type PublishPackageOption = {
  * @param option
  *  option.enforce: if true, the package will be published even if it's already published for the networkType
  *  option.writeToml: if true, it will write a `Move.${networkType}.toml` file for the package
- *  option.objectIdsParser: if provided, it will write a `object-ids.${networkType}.json` file with the parsed objectIds
+ *  option.publishResultParser: if provided, it will write a `publish-result.${networkType}.json` file with the parsed objectIds
  */
 export const publishPackageEmpower = async (
   packagePublisher: SuiPackagePublisher,
   pkgPath: string,
   signer: RawSigner,
   networkType: NetworkType,
-  option: PublishPackageOption = { enforce: false, writeToml: false, objectIdsParser: undefined }
+  option: PublishPackageOption = { enforce: false, writeToml: false, publishResultParser: undefined }
 ) => {
   const enforce = option.enforce || false;
   const writeToml = option.writeToml || false;
-  const objectIdsParser = option.objectIdsParser || undefined;
+  const publishResultParser = option.publishResultParser || undefined;
 
   const moveTomlPathForNetworkType = path.join(pkgPath, `Move.${networkType}.toml`);
   const shouldPublish = !fs.existsSync(moveTomlPathForNetworkType) || enforce;
@@ -46,9 +46,9 @@ export const publishPackageEmpower = async (
     if (writeToml) {
       writeTomlForNetworkType(pkgPath, res.packageId, networkType);
     }
-    if (objectIdsParser) {
-      const objIds = objectIdsParser(res);
-      writeAsJson(objIds, path.join(pkgPath, `object-ids.${networkType}.json`));
+    if (publishResultParser) {
+      const parsedPublishResult = publishResultParser(res);
+      writeAsJson(parsedPublishResult, path.join(pkgPath, `publish-result.${networkType}.json`));
     }
     return res;
   } else {
