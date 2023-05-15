@@ -9,7 +9,7 @@ dotenv.config();
 
 (async() => {
   const secretKey = process.env.SECRET_KEY;
-  const suiKit = new SuiKit({ secretKey, networkType: 'localhost' });
+  const suiKit = new SuiKit({ secretKey, networkType: 'localnet' });
 
   const oldPkgId = '0xcc77b8de275be5b0b45fa89cc20b31dcb5e7c7cb1bfdb91769994223fce60190';
   const upgradeCapId = '0xddcef41d727acf5ea2d7ce6cc973e259e9c45c8ac0c157583da125703a92692c';
