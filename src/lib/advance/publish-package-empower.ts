@@ -47,9 +47,10 @@ export const publishPackageEmpower = async (
       writeTomlForNetworkType(pkgPath, res.packageId, networkType);
     }
     if (publishResultParser) {
-      const parsedPublishResult = publishResultParser(res);
       const defaultPublishResult = { packageId: res.packageId, upgradeCapId: res.upgradeCapId };
-      writeAsJson({ ...defaultPublishResult, ...parsedPublishResult }, path.join(pkgPath, `publish-result.${networkType}.json`));
+      const parsedPublishResult = publishResultParser(res);
+      const output = { ...defaultPublishResult, ...parsedPublishResult };
+      writeAsJson(output, path.join(pkgPath, `publish-result.${networkType}.json`));
     }
     return res;
   } else {
@@ -99,4 +100,3 @@ const writeTomlForNetworkType = (pkgPath: string, packageId: string, networkType
   const newTomlPath = path.join(pkgPath, `Move.${networkType}.toml`);
   writeMoveToml(moveToml, newTomlPath);
 }
-

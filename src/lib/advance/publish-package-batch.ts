@@ -23,15 +23,18 @@ export const publishPackageBatch = async (
   networkType: NetworkType,
 ) => {
   const normalizedPackageBatch = normalizePackageBatch(packageBatch);
-  for (const pkg of normalizedPackageBatch) {
-    await publishPackageEmpower(packagePublisher, pkg.packagePath, signer, networkType, pkg.option);
-    // Need to replace the Move.toml file with the Move.${networkType}.toml file, so that the following packages can depend on it
-    replaceMoveTomlForNetworkType(pkg.packagePath, networkType);
+  try {
+    for (const pkg of normalizedPackageBatch) {
+      await publishPackageEmpower(packagePublisher, pkg.packagePath, signer, networkType, pkg.option);
+      // Need to replace the Move.toml file with the Move.${networkType}.toml file, so that the following packages can depend on it
+      replaceMoveTomlForNetworkType(pkg.packagePath, networkType);
+    }
+  } finally {
+    // After all packages are published, restore the Move.toml file for each package
+    normalizedPackageBatch.forEach((pkg) => {
+      restoreMoveToml(pkg.packagePath);
+    });
   }
-  // After all packages are published, restore the Move.toml file for each package
-  normalizedPackageBatch.forEach((pkg) => {
-    restoreMoveToml(pkg.packagePath);
-  });
 }
 
 const normalizePackageBatch = (packageBatch: PackageBatch) => {
