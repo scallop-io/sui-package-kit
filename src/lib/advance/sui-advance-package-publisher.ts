@@ -19,7 +19,7 @@ export class SuiAdvancePackagePublisher {
   /**
    * Create a `SuiPackageAdvancePublisher` instance
    * @param suiBin, the path to the `sui` binary, if not provided, it will use the `sui` in the `PATH`
-   * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localhost'
+   * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
    */
   constructor(params: {suiBin?: string, networkType: NetworkType}) {
     this.networkType = params.networkType;

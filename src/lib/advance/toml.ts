@@ -8,7 +8,7 @@ type MoveToml = {
   ['devnet-addresses']?: Record<string, any>;
   ['testnet-addresses']?: Record<string, any>;
   ['mainnet-addresses']?: Record<string, any>;
-  ['localhost-addresses']?: Record<string, any>;
+  ['localnet-addresses']?: Record<string, any>;
 }
 
 export const parseMoveToml = (tomlPath: string) => {

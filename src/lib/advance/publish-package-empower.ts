@@ -22,7 +22,7 @@ export type PublishPackageOption = {
  * @param packagePublisher the `SuiPackagePublisher` instance
  * @param pkgPath path to the move package
  * @param signer the `RawSigner` from the @mysten/sui.js
- * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localhost'
+ * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
  * @param option
  *  option.enforce: if true, the package will be published even if it's already published for the networkType
  *  option.writeToml: if true, it will write a `Move.${networkType}.toml` file for the package
@@ -87,7 +87,7 @@ const publishPackage = async (
  * Write the `Move.${networkType}.toml` file with the given packageId based on the `Move.toml`
  * @param pkgPath path to the move package
  * @param packageId the packageId for the given networkType
- * @param networkType 'devnet' | 'testnet' | 'mainnet' | 'localhost'
+ * @param networkType 'devnet' | 'testnet' | 'mainnet' | 'localnet'
  */
 const writeTomlForNetworkType = (pkgPath: string, packageId: string, networkType: NetworkType) => {
   const tomlPath = path.join(pkgPath, "Move.toml");

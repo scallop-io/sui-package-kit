@@ -14,7 +14,7 @@ export type PackageBatch = { packagePath: string, option?: PublishPackageOption 
  * @param packagePublisher the `SuiPackagePublisher` instance
  * @param packageBatch the batch of packages to publish, you can specify the option for each package
  * @param signer the `RawSigner` from the @mysten/sui.js
- * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localhost'
+ * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
  */
 export const publishPackageBatch = async (
   packagePublisher: SuiPackagePublisher,
@@ -59,7 +59,7 @@ const defaultPublishResultParser = (publishResult: PackagePublishResult) => {
  * Replace the `Move.toml` file with the `Move.${networkType}.toml` file
  * And make a backup of the `Move.toml` file as `Move.toml.bak`
  * @param pkgPath path to the move package
- * @param networkType 'devnet' | 'testnet' | 'mainnet' | 'localhost'
+ * @param networkType 'devnet' | 'testnet' | 'mainnet' | 'localnet'
  */
 const replaceMoveTomlForNetworkType = (pkgPath: string, networkType: NetworkType) => {
   const tomlPathForNetwork= path.join(pkgPath, `Move.${networkType}.toml`);
