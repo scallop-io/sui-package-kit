@@ -45,13 +45,16 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@mysten/sui.js": "^0.34.0",
+    "@mysten/sui.js": "^0.34.1",
     "colorts": "^0.1.63",
     "superstruct": "^1.0.3",
     "tmp": "^0.2.1"
   },
+  "peerDependencies": {
+    "@mysten/sui.js": "^0.34.1"
+  },
   "devDependencies": {
-    "@scallop-io/sui-kit": "^0.34.0",
+    "@scallop-io/sui-kit": "^0.34.1",
     "@types/node": "^20.1.5",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",
