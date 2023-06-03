@@ -19,8 +19,8 @@ dependencies:
 
 devDependencies:
   '@scallop-io/sui-kit':
-    specifier: ^0.34.0
-    version: 0.34.0(@mysten/sui.js@0.34.1)
+    specifier: ^0.34.1
+    version: 0.34.1(@mysten/sui.js@0.34.1)
   '@types/node':
     specifier: ^20.1.5
     version: 20.1.5
@@ -281,11 +281,11 @@ packages:
   /@noble/hashes@1.3.0:
     resolution: {integrity: sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==}
 
-  /@scallop-io/sui-kit@0.34.0(@mysten/sui.js@0.34.1):
-    resolution: {integrity: sha512-lQ5GFZRXQ3DtEMZiNoypwqFQ5DJuClfUHL2ycEx/Ks/oQ5UaONai7qwPtfhTz7q58UtSTM0M2QKH9pWyKWumIA==}
+  /@scallop-io/sui-kit@0.34.1(@mysten/sui.js@0.34.1):
+    resolution: {integrity: sha512-oHefR2ARLUZ/HcYb3cmZgicHQnn2N5FrteK6l4j2oZUcSSyTy5HDSxxZpIm+IJuhDX4Owks7yEgmLxE62I7/KA==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@mysten/sui.js': ^0.34.0
+      '@mysten/sui.js': ^0.34.1
     dependencies:
       '@mysten/sui.js': 0.34.1
       '@scure/bip39': 1.2.0
