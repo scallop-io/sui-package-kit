@@ -6,12 +6,15 @@ export const parsePublishTxn = (suiResponse: SuiTransactionBlockResponse) => {
   const parseRes = {
     packageId: '',
     upgradeCapId: '',
+    publisherId: undefined as string | undefined,
     created: [] as { type: string; objectId: string, owner: string }[],
   }
   if (objectChanges) {
     for (const change of objectChanges) {
       if (change.type === 'created' && change.objectType.endsWith('package::UpgradeCap')) {
         parseRes.upgradeCapId = change.objectId;
+      } else if (change.type === 'created' && change.objectType.endsWith('package::Publisher')) {
+        parseRes.publisherId = change.objectId;
       } else if (change.type === 'published') {
         parseRes.packageId = change.packageId;
       } else if (change.type === 'created') {

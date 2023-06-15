@@ -54,7 +54,7 @@
     "@mysten/sui.js": "^0.35.1"
   },
   "devDependencies": {
-    "@scallop-io/sui-kit": "^0.35.2",
+    "@scallop-io/sui-kit": "^0.35.3",
     "@types/node": "^20.1.5",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",
