@@ -77,6 +77,7 @@ const publishPackage = async (
     skipFetchLatestGitDeps: true
   });
   if (!res.packageId) {
+    console.error(res);
     throw new Error(`Package publish failed at path: ${pkgPath}`)
   }
   return res;

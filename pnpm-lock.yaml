@@ -5,8 +5,8 @@ dependencies:
     specifier: ^2.2.5
     version: 2.2.5
   '@mysten/sui.js':
-    specifier: ^0.35.1
-    version: 0.35.1
+    specifier: ^0.36.0
+    version: 0.36.0
   colorts:
     specifier: ^0.1.63
     version: registry.npmmirror.com/colorts@0.1.63
@@ -19,8 +19,8 @@ dependencies:
 
 devDependencies:
   '@scallop-io/sui-kit':
-    specifier: ^0.35.3
-    version: 0.35.3(@mysten/sui.js@0.35.1)
+    specifier: ^0.36.1
+    version: 0.36.1(@mysten/sui.js@0.36.0)
   '@types/node':
     specifier: ^20.1.5
     version: 20.1.5
@@ -244,16 +244,16 @@ packages:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
     dev: false
 
-  /@mysten/bcs@0.7.1:
-    resolution: {integrity: sha512-wFPb8bkhwrbiStfZMV5rFM7J+umpke59/dNjDp+UYJKykNlW23LCk2ePyEUvGdb62HGJM1jyOJ8g4egE3OmdKA==}
+  /@mysten/bcs@0.7.2:
+    resolution: {integrity: sha512-M8aUGFwoBEj9XPCJcYuVlv8UbqBINAYhrDGLavdCYZwGlN5saGgrBcnGpXk+D2/Vp+aEUFh3RCyKudn7H0G9hQ==}
     dependencies:
       bs58: 5.0.0
 
-  /@mysten/sui.js@0.35.1:
-    resolution: {integrity: sha512-1UQ65oJhO+G5Bt+EWYqMs5y3eqY1ZZxEdB2y4K+XJVeRZBOy32GjSLiYmZufUAR9o53gAlwAvvNRIzMzuiNQzw==}
+  /@mysten/sui.js@0.36.0:
+    resolution: {integrity: sha512-l/gZUxlr0oHgnwuHYxIVp+JOrdj1imhffL5iK25JYh3WV4sTxiQntCLuSen6etXyFG9c1l2GNvVaGZaV3mb4Hw==}
     engines: {node: '>=16'}
     dependencies:
-      '@mysten/bcs': 0.7.1
+      '@mysten/bcs': 0.7.2
       '@noble/curves': 1.0.0
       '@noble/hashes': 1.3.0
       '@open-rpc/client-js': 1.8.1
@@ -287,13 +287,13 @@ packages:
       - encoding
       - utf-8-validate
 
-  /@scallop-io/sui-kit@0.35.3(@mysten/sui.js@0.35.1):
-    resolution: {integrity: sha512-3y0MtNoOQKeKu/GzsMiwBqvJmRGsfbVSZu8N+ZSH+2Qt+gxD/WxFWgJ4wC7bJNIAvr4naUOYg5aT6lFRT3WkQw==}
+  /@scallop-io/sui-kit@0.36.1(@mysten/sui.js@0.36.0):
+    resolution: {integrity: sha512-PMz4Tn6myxVOPWEisI4ULx+gscGCiqn7j62Ncda32GQZh5sPFrGUnixu0rn2cyVOBGmwWdTpjG6xBYKVLwfTvw==}
     engines: {node: '>=18'}
     peerDependencies:
-      '@mysten/sui.js': ^0.35.1
+      '@mysten/sui.js': ^0.36.0
     dependencies:
-      '@mysten/sui.js': 0.35.1
+      '@mysten/sui.js': 0.36.0
       '@scure/bip39': 1.2.0
       assert: 2.0.0
       colorts: 0.1.63
