@@ -20,7 +20,7 @@ const defaultPublishOptions: PublishOptions = {
 export type PackagePublishResult = {
   packageId: string,
   upgradeCapId: string,
-  publisherId?: string,
+  publisherIds: string[],
   created: { type: string; objectId: string, owner: string }[],
   publishTxn: SuiTransactionBlockResponse,
 }
@@ -59,7 +59,7 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
   // If the publish transaction is successful, retrieve the packageId from the 'publish' event
   // Otherwise, return empty data
   if (getExecutionStatusType(publishTxn) === 'success') {
-    const { packageId, upgradeCapId, publisherId, created } = parsePublishTxn(publishTxn);
+    const { packageId, upgradeCapId, publisherIds, created } = parsePublishTxn(publishTxn);
     console.log('Successfully published package\n'.green)
     console.log('==============Created objects=============='.gray)
     created.forEach(({ type, objectId , owner}) => {
@@ -70,10 +70,9 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
     console.log('==============Package info=============='.gray)
     console.log('PackageId: '.gray, packageId.blue.bold)
     console.log('UpgradeCapId: '.gray, upgradeCapId.blue.bold, '\n')
-    publisherId && console.log('PublisherId: '.gray, publisherId.blue.bold, '\n')
-    return { packageId, publishTxn, created, upgradeCapId, publisherId };
+    return { packageId, publishTxn, created, upgradeCapId, publisherIds };
   } else {
     console.error('Publish package failed!'.red)
-    return { packageId: '', publishTxn, created: [], upgradeCapId: '' };
+    return { packageId: '', publishTxn, created: [], upgradeCapId: '', publisherIds: [] };
   }
 }
