@@ -47,7 +47,7 @@ export const publishPackageEmpower = async (
       writeTomlForNetworkType(pkgPath, res.packageId, networkType);
     }
     if (publishResultParser) {
-      const defaultPublishResult = { packageId: res.packageId, upgradeCapId: res.upgradeCapId };
+      const defaultPublishResult = { packageId: res.packageId, upgradeCapId: res.upgradeCapId, publisherId: res.publisherId };
       const parsedPublishResult = publishResultParser(res);
       const output = { ...defaultPublishResult, ...parsedPublishResult };
       writeAsJson(output, path.join(pkgPath, `publish-result.${networkType}.json`));
