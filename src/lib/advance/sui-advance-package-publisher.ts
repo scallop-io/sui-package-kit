@@ -1,8 +1,13 @@
-import { RawSigner } from "@mysten/sui.js"
+import {JsonRpcProvider, RawSigner} from "@mysten/sui.js"
 import { SuiPackagePublisher } from "../sui-package-publisher"
 import type { NetworkType } from "./network-type"
 import { publishPackageBatch, PackageBatch } from "./publish-package-batch"
 import { publishPackageEmpower, PublishPackageOption } from "./publish-package-empower"
+import {
+  createUpgradePackageTxWithDependencies,
+  upgradePackageWithDependencies
+} from "./upgrade-package-with-dependencies";
+import {UpgradeOptions} from "../upgrade-package";
 
 /**
  * This is an advance version of the `SuiPackagePublisher` class
@@ -48,5 +53,47 @@ export class SuiAdvancePackagePublisher {
    */
   public async publishPackageBatch(packageBatch: PackageBatch, signer: RawSigner) {
     return await publishPackageBatch(this.packagePublisher, packageBatch, signer, this.networkType);
+  }
+
+  public async upgradePackageWithDependencies(
+    packagePath: string,
+    oldPackageId: string,
+    upgradeCapId: string,
+    dependencies: { packagePath: string }[],
+    signer: RawSigner,
+    options?: UpgradeOptions,
+  ) {
+    return await upgradePackageWithDependencies(
+      this.packagePublisher,
+      packagePath,
+      oldPackageId,
+      upgradeCapId,
+      dependencies,
+      signer,
+      this.networkType,
+      options,
+    );
+  }
+
+  public async createUpgradePackageTxWithDependencies(
+    packagePath: string,
+    oldPackageId: string,
+    upgradeCapId: string,
+    dependencies: { packagePath: string }[],
+    provider: JsonRpcProvider,
+    publisher: string,
+    options?: UpgradeOptions,
+  ) {
+    return await createUpgradePackageTxWithDependencies(
+      this.packagePublisher,
+      packagePath,
+      oldPackageId,
+      upgradeCapId,
+      dependencies,
+      provider,
+      publisher,
+      this.networkType,
+      options,
+    );
   }
 }

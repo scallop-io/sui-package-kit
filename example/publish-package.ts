@@ -4,16 +4,20 @@
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { SuiKit } from "@scallop-io/sui-kit";
-import { SuiPackagePublisher } from "../src";
+import { SuiAdvancePackagePublisher, PackageBatch } from "../src";
 dotenv.config();
 
 (async() => {
   const secretKey = process.env.SECRET_KEY;
-  const suiKit = new SuiKit({ secretKey, networkType: 'devnet' });
+  const suiKit = new SuiKit({ secretKey, networkType: 'testnet' });
 
-  const packagePath = path.join(__dirname, './sample_move/package_a');
-  const publisher = new SuiPackagePublisher();
+  let advancedPublisher = new SuiAdvancePackagePublisher({ networkType: 'testnet' });
 
-  const result = await publisher.publishPackage(packagePath, suiKit.getSigner(), { skipFetchLatestGitDeps: true });
+  const packageBatch: PackageBatch = [
+    { packagePath: path.join(__dirname, './sample_move/package_b'), option: { enforce: true } },
+    { packagePath: path.join(__dirname, './sample_move/package_a'), option: { enforce: true } }
+  ]
+
+  const result = await advancedPublisher.publishPackageBatch(packageBatch, suiKit.getSigner());
   console.log(result);
 })();

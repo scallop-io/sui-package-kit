@@ -3,24 +3,34 @@
  */
 import * as path from "path";
 import * as dotenv from "dotenv";
-import { SuiKit } from "@scallop-dao/sui-kit";
-import { SuiPackagePublisher } from "../src";
+import { SuiKit } from "@scallop-io/sui-kit";
+import { fromB64 } from '@mysten/sui.js';
+import { SuiAdvancePackagePublisher } from "../src";
+import {Dependencies} from "../src/lib/advance/upgrade-package-with-dependencies";
 dotenv.config();
 
 (async() => {
   const secretKey = process.env.SECRET_KEY;
-  const suiKit = new SuiKit({ secretKey, networkType: 'localnet' });
+  const suiKit = new SuiKit({ secretKey, networkType: 'testnet' });
 
-  const oldPkgId = '0xcc77b8de275be5b0b45fa89cc20b31dcb5e7c7cb1bfdb91769994223fce60190';
-  const upgradeCapId = '0xddcef41d727acf5ea2d7ce6cc973e259e9c45c8ac0c157583da125703a92692c';
+  const oldPkgId = '0x0eb24956c6a9b6a1dc8eba3e90f4f86776649fde7084d1531a6fdb3641016be6';
+  const upgradeCapId = '0x903058cfdbba7d014bac3fe2c95619b7f6afca5d04466db2be1151add146c56f';
   const packagePath = path.join(__dirname, './sample_move/package_a_upgrade');
-  const publisher = new SuiPackagePublisher();
-  const result = await publisher.upgradePackage({
+  const dependencies: Dependencies = [
+    { packagePath: path.join(__dirname, './sample_move/package_b') }
+  ];
+
+  const publisher = new SuiAdvancePackagePublisher({ networkType: 'testnet' });
+  const tx = await publisher.createUpgradePackageTxWithDependencies(
     packagePath,
-    oldPackageId: oldPkgId,
+    oldPkgId,
     upgradeCapId,
-    signer: suiKit.getSigner(),
-    options: { skipFetchLatestGitDeps: true }
-    });
-  console.log(result);
+    dependencies,
+    suiKit.provider(),
+    suiKit.currentAddress()
+  );
+
+  const res = await suiKit.signAndSendTxn(fromB64(tx.txBytesBase64));
+  console.log(res);
+  return res;
 })();

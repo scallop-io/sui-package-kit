@@ -41,6 +41,6 @@ module package_a::orange {
   ): Coin<ORANGE> {
     let apple_amount = coin::value(&apple);
     coin::join(&mut vault.apple, apple);
-    coin::mint(treasury_cap, apple_amount * 2, ctx)
+    coin::mint(treasury_cap, apple_amount, ctx)
   }
 }

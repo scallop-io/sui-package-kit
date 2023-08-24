@@ -1,6 +1,6 @@
-import {RawSigner} from "@mysten/sui.js";
-import { PublishOptions, publishPackage } from "./publish-package";
-import { upgradePackage, UpgradeOptions } from "./upgrade-package"
+import {JsonRpcProvider, RawSigner} from "@mysten/sui.js";
+import {createPublishTx, PublishOptions, publishPackage} from "./publish-package";
+import {upgradePackage, UpgradeOptions, createUpgradePackageTx} from "./upgrade-package"
 import { buildPackage, BuildOptions } from "./build-package"
 
 type UpgradeParams = {
@@ -31,7 +31,19 @@ export class SuiPackagePublisher {
    *  PublishPackageResult.created: the created objects in the publish transaction,  type `{ type: string; objectId: string, owner: string }[]`
    */
   async publishPackage(packagePath: string, signer: RawSigner, options?: PublishOptions) {
-    return publishPackage(this.suiBin, packagePath, signer, options)
+    return publishPackage(this.suiBin, packagePath, signer, options);
+  }
+
+  /**
+   * Create a publish package transaction for signing and sending
+   * @param packagePath, the path to the package to be built
+   * @param provider, the provider to build the transaction
+   * @param publisher, the publisher who is going to publish the package
+   * @param options, the options for building the transaction
+   * @returns the base64 encoded transaction bytes, and the transaction block
+   */
+  async createPulishPackageTx(packagePath: string, provider: JsonRpcProvider, publisher: string, options?: PublishOptions) {
+    return createPublishTx(this.suiBin, packagePath, provider, publisher, options);
   }
 
   /**
@@ -57,6 +69,25 @@ export class SuiPackagePublisher {
       oldPackageId,
       upgradeCapId,
       signer,
+      options
+    );
+  }
+
+  async createUpgradePackageTx(
+    packagePath: string,
+    oldPackageId: string,
+    upgradeCapId: string,
+    provider: JsonRpcProvider,
+    publisher: string,
+    options?: UpgradeOptions
+  ) {
+    return createUpgradePackageTx(
+      this.suiBin,
+      packagePath,
+      oldPackageId,
+      upgradeCapId,
+      provider,
+      publisher,
       options
     );
   }

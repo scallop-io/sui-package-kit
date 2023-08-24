@@ -3,7 +3,7 @@ import {
   TransactionBlock,
   RawSigner,
   getExecutionStatusType,
-  SuiTransactionBlockResponse,
+  SuiTransactionBlockResponse, JsonRpcProvider,
 } from "@mysten/sui.js";
 import {parsePublishTxn} from './sui-response-parser';
 import { BuildOptions, defaultBuildOptions, buildPackage } from './build-package'
@@ -75,4 +75,45 @@ export const publishPackage = async (suiBinPath: string, packagePath: string, si
     console.error('Publish package failed!'.red)
     return { packageId: '', publishTxn, created: [], upgradeCapId: '', publisherIds: [] };
   }
+}
+
+/**
+ * create transaction bytes for publishing a package to the SUI blockchain
+ * @param suiBinPath, the path to the sui client binary
+ * @param packagePath, the path to the package to be built
+ * @param provider, the provider corrsponding to the network
+ * @param publisher, the sender who is going the publish the package
+ * @returns transaction bytes in base64 and transction block for publishing a package to the SUI blockchain
+ */
+export const createPublishTx = async (
+  suiBinPath: string,
+  packagePath: string,
+  provider: JsonRpcProvider,
+  publisher: string,
+  options: PublishOptions = defaultPublishOptions
+) => {
+  const gasBudget = options.gasBudget || defaultPublishOptions.gasBudget as number;
+
+  // build the package
+  const { modules, dependencies } = buildPackage(suiBinPath, packagePath, options);
+
+  // create a transaction block for publish package
+  const publishTxnBlock = new TransactionBlock();
+  // TODO: publish dry run fails currently. Remove this once it's fixed.
+  publishTxnBlock.setGasBudget(gasBudget);
+
+  // obtain the upgradeCap, and transfer it to the publisher
+  const upgradeCap = publishTxnBlock.publish({
+    modules,
+    dependencies,
+  });
+  publishTxnBlock.transferObjects([upgradeCap], publishTxnBlock.pure(publisher));
+
+  // set the sender
+  publishTxnBlock.setSender(publisher);
+
+  const txBytes = await publishTxnBlock.build({ provider });
+  const txBytesBase64 = Buffer.from(txBytes).toString('base64');
+
+  return { txBytesBase64, tx: publishTxnBlock }
 }
