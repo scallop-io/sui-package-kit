@@ -55,6 +55,6 @@ export const buildPackage = (suiBinPath: string, packagePath: string, options: B
     } as BuildPackageResult;
   } catch (e) {
     console.error('Build package failed!'.red);
-    throw new Error(`error building package at ${packagePath}, error: ${e}`);
+    throw new Error(`error building package at ${packagePath}, stdout: \n${(e as any).stdout.red}`);
   }
 }
