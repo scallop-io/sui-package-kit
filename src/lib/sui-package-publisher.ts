@@ -1,13 +1,16 @@
-import {JsonRpcProvider, RawSigner} from "@mysten/sui.js";
 import {createPublishTx, PublishOptions, publishPackage} from "./publish-package";
 import {upgradePackage, UpgradeOptions, createUpgradePackageTx} from "./upgrade-package"
 import { buildPackage, BuildOptions } from "./build-package"
+import { SuiClient } from "@mysten/sui/client";
+import { SuiKit } from "@scallop-io/sui-kit";
+import { Keypair } from "@mysten/sui/cryptography";
 
 type UpgradeParams = {
   packagePath: string,
   oldPackageId: string,
   upgradeCapId: string,
-  signer: RawSigner,
+  client: SuiClient,
+  keyPair: Keypair
   options?: UpgradeOptions
 }
 
@@ -22,7 +25,7 @@ export class SuiPackagePublisher {
    * It starts a child process to call the "sui binary" to build the move package
    * The building process takes place in a tmp directory, which would be cleaned later
    * @param packagePath the path to the package to be published
-   * @param signer the signer who is going to upgrade the package
+   * @param suiKit the `SuiKit` instance
    *
    * @returns PublishPackageResult
    *  PublishPackageResult.packageId: the package id of the published package
@@ -30,20 +33,20 @@ export class SuiPackagePublisher {
    *  PublishPackageResult.publishTxn: the publish transaction block response, type `SuiTransactionBlockResponse`
    *  PublishPackageResult.created: the created objects in the publish transaction,  type `{ type: string; objectId: string, owner: string }[]`
    */
-  async publishPackage(packagePath: string, signer: RawSigner, options?: PublishOptions) {
-    return publishPackage(this.suiBin, packagePath, signer, options);
+  async publishPackage(packagePath: string, suiKit: SuiKit, options?: PublishOptions) {
+    return publishPackage(this.suiBin, packagePath, suiKit, options);
   }
 
   /**
    * Create a publish package transaction for signing and sending
    * @param packagePath, the path to the package to be built
-   * @param provider, the provider to build the transaction
+   * @param client, SuiClient
    * @param publisher, the publisher who is going to publish the package
    * @param options, the options for building the transaction
    * @returns the base64 encoded transaction bytes, and the transaction block
    */
-  async createPulishPackageTx(packagePath: string, provider: JsonRpcProvider, publisher: string, options?: PublishOptions) {
-    return createPublishTx(this.suiBin, packagePath, provider, publisher, options);
+  async createPulishPackageTx(packagePath: string, client: SuiClient, publisher: string, options?: PublishOptions) {
+    return createPublishTx(this.suiBin, packagePath, client, publisher, options);
   }
 
   /**
@@ -62,13 +65,14 @@ export class SuiPackagePublisher {
    *   UpgradePackageResult.upgradeTxn: the upgrade transaction block response, type `SuiTransactionBlockResponse`
    */
   async upgradePackage(params: UpgradeParams) {
-    const { packagePath, oldPackageId, upgradeCapId, signer, options } = params;
+    const { packagePath, oldPackageId, upgradeCapId, client, keyPair, options } = params;
     return upgradePackage(
       this.suiBin,
       packagePath,
       oldPackageId,
       upgradeCapId,
-      signer,
+      client,
+      keyPair,
       options
     );
   }
@@ -77,7 +81,7 @@ export class SuiPackagePublisher {
     packagePath: string,
     oldPackageId: string,
     upgradeCapId: string,
-    provider: JsonRpcProvider,
+    client: SuiClient,
     publisher: string,
     options?: UpgradeOptions
   ) {
@@ -86,7 +90,7 @@ export class SuiPackagePublisher {
       packagePath,
       oldPackageId,
       upgradeCapId,
-      provider,
+      client,
       publisher,
       options
     );

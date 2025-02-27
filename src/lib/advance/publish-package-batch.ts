@@ -1,10 +1,11 @@
-import { RawSigner } from "@mysten/sui.js";
 import type { NetworkType } from "./network-type";
 import type { PackagePublishResult } from "../publish-package";
 import { SuiPackagePublisher } from "../sui-package-publisher";
 import { publishPackageEmpower } from "./publish-package-empower";
 import type { PublishPackageOption } from "./publish-package-empower";
 import { replaceMoveTomlForNetworkType, restoreMoveToml } from "./toml";
+import { Keypair } from "@mysten/sui/cryptography";
+import { SuiKit } from "@scallop-io/sui-kit";
 
 export type PackageBatch = { packagePath: string, option?: PublishPackageOption }[]
 
@@ -12,19 +13,19 @@ export type PackageBatch = { packagePath: string, option?: PublishPackageOption 
  * Publish a batch of packages in order
  * @param packagePublisher the `SuiPackagePublisher` instance
  * @param packageBatch the batch of packages to publish, you can specify the option for each package
- * @param signer the `RawSigner` from the @mysten/sui.js
+ * @param suiKit the `SuiKit` instance
  * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
  */
 export const publishPackageBatch = async (
   packagePublisher: SuiPackagePublisher,
   packageBatch: PackageBatch,
-  signer: RawSigner,
+  suiKit: SuiKit,
   networkType: NetworkType,
 ) => {
   const normalizedPackageBatch = normalizePackageBatch(packageBatch);
   try {
     for (const pkg of normalizedPackageBatch) {
-      await publishPackageEmpower(packagePublisher, pkg.packagePath, signer, networkType, pkg.option);
+      await publishPackageEmpower(packagePublisher, pkg.packagePath, suiKit, networkType, pkg.option);
       // Need to replace the Move.toml file with the Move.${networkType}.toml file, so that the following packages can depend on it
       replaceMoveTomlForNetworkType(pkg.packagePath, networkType);
     }

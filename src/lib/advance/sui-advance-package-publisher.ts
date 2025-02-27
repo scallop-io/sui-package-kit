@@ -1,13 +1,14 @@
-import {JsonRpcProvider, RawSigner} from "@mysten/sui.js"
-import { SuiPackagePublisher } from "../sui-package-publisher"
-import type { NetworkType } from "./network-type"
-import { publishPackageBatch, PackageBatch } from "./publish-package-batch"
-import { publishPackageEmpower, PublishPackageOption } from "./publish-package-empower"
+import { SuiPackagePublisher } from "../sui-package-publisher";
+import type { NetworkType } from "./network-type";
+import { publishPackageBatch, PackageBatch } from "./publish-package-batch";
+import { publishPackageEmpower, PublishPackageOption } from "./publish-package-empower";
 import {
   createUpgradePackageTxWithDependencies,
-  upgradePackageWithDependencies
+  upgradePackageWithDependencies,
 } from "./upgrade-package-with-dependencies";
-import {UpgradeOptions} from "../upgrade-package";
+import { UpgradeOptions } from "../upgrade-package";
+import { SuiKit } from "@scallop-io/sui-kit";
+import { SuiClient } from "@mysten/sui/client";
 
 /**
  * This is an advance version of the `SuiPackagePublisher` class
@@ -18,7 +19,7 @@ import {UpgradeOptions} from "../upgrade-package";
  *   you can customize the parser for the objectIds
  */
 export class SuiAdvancePackagePublisher {
-  public packagePublisher: SuiPackagePublisher
+  public packagePublisher: SuiPackagePublisher;
   public networkType: NetworkType;
 
   /**
@@ -26,7 +27,7 @@ export class SuiAdvancePackagePublisher {
    * @param suiBin, the path to the `sui` binary, if not provided, it will use the `sui` in the `PATH`
    * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
    */
-  constructor(params: {suiBin?: string, networkType: NetworkType}) {
+  constructor(params: { suiBin?: string; networkType: NetworkType }) {
     this.networkType = params.networkType;
     this.packagePublisher = new SuiPackagePublisher(params.suiBin);
   }
@@ -34,7 +35,7 @@ export class SuiAdvancePackagePublisher {
   /**
    * Publish the move package and provide options to write toml and save objectIds
    * @param pkgPath path to the move package
-   * @param signer the `RawSigner` from the @mysten/sui.js
+   * @param suiKit SuiKit instance
    * @param option
    *  option.enforce: if true, the package will be published even if it's already published for the networkType
    *  option.writeToml: if true, it will write a `Move.${networkType}.toml` file for the package
@@ -42,17 +43,17 @@ export class SuiAdvancePackagePublisher {
    *
    *  @return the `PackagePublishResult` from the `SuiPackagePublisher` or `undefined` if the package is already published
    */
-  public async publishPackage(pkgPath: string, signer: RawSigner, option?: PublishPackageOption) {
-    return await publishPackageEmpower(this.packagePublisher, pkgPath, signer, this.networkType, option);
+  public async publishPackage(pkgPath: string, suiKit: SuiKit, option?: PublishPackageOption) {
+    return await publishPackageEmpower(this.packagePublisher, pkgPath, suiKit, this.networkType, option);
   }
 
   /**
    * Publish a batch of packages in order
    * @param packageBatch the array of packages to publish, you can specify the option for each package
-   * @param signer the `RawSigner` from the @mysten/sui.js
+   * @param suiKit SuiKit instance
    */
-  public async publishPackageBatch(packageBatch: PackageBatch, signer: RawSigner) {
-    return await publishPackageBatch(this.packagePublisher, packageBatch, signer, this.networkType);
+  public async publishPackageBatch(packageBatch: PackageBatch, suiKit: SuiKit) {
+    return await publishPackageBatch(this.packagePublisher, packageBatch, suiKit, this.networkType);
   }
 
   public async upgradePackageWithDependencies(
@@ -60,8 +61,8 @@ export class SuiAdvancePackagePublisher {
     oldPackageId: string,
     upgradeCapId: string,
     dependencies: { packagePath: string }[],
-    signer: RawSigner,
-    options?: UpgradeOptions,
+    suiKit: SuiKit,
+    options?: UpgradeOptions
   ) {
     return await upgradePackageWithDependencies(
       this.packagePublisher,
@@ -69,9 +70,9 @@ export class SuiAdvancePackagePublisher {
       oldPackageId,
       upgradeCapId,
       dependencies,
-      signer,
+      suiKit,
       this.networkType,
-      options,
+      options
     );
   }
 
@@ -80,9 +81,9 @@ export class SuiAdvancePackagePublisher {
     oldPackageId: string,
     upgradeCapId: string,
     dependencies: { packagePath: string }[],
-    provider: JsonRpcProvider,
+    client: SuiClient,
     publisher: string,
-    options?: UpgradeOptions,
+    options?: UpgradeOptions
   ) {
     return await createUpgradePackageTxWithDependencies(
       this.packagePublisher,
@@ -90,10 +91,10 @@ export class SuiAdvancePackagePublisher {
       oldPackageId,
       upgradeCapId,
       dependencies,
-      provider,
+      client,
       publisher,
       this.networkType,
-      options,
+      options
     );
   }
 }

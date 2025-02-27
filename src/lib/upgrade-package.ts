@@ -1,29 +1,26 @@
-import 'colorts/lib/string';
-import {
-  TransactionBlock,
-  RawSigner,
-  getExecutionStatusType,
-  UpgradePolicy, JsonRpcProvider,
-} from "@mysten/sui.js";
+import "colorts/lib/string";
+import { Transaction, UpgradePolicy } from "@scallop-io/sui-kit";
 import { buildPackage } from "./build-package";
 import { parseUpgradeTxn } from "./sui-response-parser";
+import { SuiClient } from "@mysten/sui/client";
+import { Keypair } from "@mysten/sui/cryptography";
 
 /**
  * Options for upgrade packages
  */
 export type UpgradeOptions = {
   // Also publish transitive dependencies that are not published yet
-  withUnpublishedDependencies?: boolean
+  withUnpublishedDependencies?: boolean;
   // Skip fetching the latest git dependencies
-  skipFetchLatestGitDeps?: boolean
-  gasBudget?: number,
-}
+  skipFetchLatestGitDeps?: boolean;
+  gasBudget?: number;
+};
 
 const defaultUpgradeOptions: UpgradeOptions = {
   withUnpublishedDependencies: true,
   skipFetchLatestGitDeps: false,
-  gasBudget: 10**9,
-}
+  gasBudget: 10 ** 9,
+};
 
 /**
  * Upgrade a package to the SUI blockchain using the sui client binary
@@ -35,16 +32,17 @@ export const upgradePackage = async (
   packagePath: string,
   oldPackageId: string,
   _upgradeCapId: string,
-  signer: RawSigner,
+  client: SuiClient,
+  keyPair: Keypair,
   options: UpgradeOptions = defaultUpgradeOptions
 ) => {
-  const gasBudget = options.gasBudget || defaultUpgradeOptions.gasBudget as number;
+  const gasBudget = options.gasBudget || (defaultUpgradeOptions.gasBudget as number);
 
   // build the package
   const { modules, dependencies, digest } = buildPackage(suiBinPath, packagePath, options);
 
   // create a transaction block for upgrade package
-  const upgradeTxnBlock = new TransactionBlock();
+  const upgradeTxnBlock = new Transaction();
   // TODO: publish dry run fails currently. Remove this once it's fixed.
   upgradeTxnBlock.setGasBudget(gasBudget);
 
@@ -53,48 +51,46 @@ export const upgradePackage = async (
     target: `0x2::package::authorize_upgrade`,
     arguments: [
       upgradeTxnBlock.object(_upgradeCapId),
-      upgradeTxnBlock.pure(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure(digest)
-    ]
+      upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
+      upgradeTxnBlock.pure.string(digest),
+    ],
   });
 
   // Upgrade the package with the ticket, get the receipt
   const receipt = upgradeTxnBlock.upgrade({
     modules,
     dependencies,
-    packageId: oldPackageId,
-    ticket
+    package: oldPackageId,
+    ticket,
   });
 
   // Commit the upgrade with the receipt
   upgradeTxnBlock.moveCall({
     target: `0x2::package::commit_upgrade`,
-    arguments: [
-      upgradeTxnBlock.object(_upgradeCapId),
-      receipt,
-    ]
+    arguments: [upgradeTxnBlock.object(_upgradeCapId), receipt],
   });
 
   // sign and submit the transaction for upgrading the package
-  console.log(`Start upgrading package at ${packagePath}`.cyan)
-  const upgradeTxn = await signer.signAndExecuteTransactionBlock({
-    transactionBlock: upgradeTxnBlock,
+  console.log(`Start upgrading package at ${packagePath}`.cyan);
+  const upgradeTxn = await client.signAndExecuteTransaction({
+    transaction: upgradeTxnBlock,
+    signer: keyPair,
     options: { showEffects: true, showObjectChanges: true },
   });
   // If the upgrade transaction is successful, retrieve the packageId from the 'upgrade' event
   // Otherwise, return empty data
-  if (getExecutionStatusType(upgradeTxn) === 'success') {
+  if (upgradeTxn.effects?.status.status === "success") {
     const { packageId, upgradeCapId } = parseUpgradeTxn(upgradeTxn);
-    console.log(`Successfully upgraded package at ${packagePath}`.green)
-    console.log('==============Package info=============='.gray)
-    console.log('PackageId: '.gray, packageId.blue.bold)
-    console.log('UpgradeCapId: '.gray, upgradeCapId.blue.bold, '\n')
-    return  { packageId, upgradeCapId, upgradeTxn };
+    console.log(`Successfully upgraded package at ${packagePath}`.green);
+    console.log("==============Package info==============".gray);
+    console.log("PackageId: ".gray, packageId.blue.bold);
+    console.log("UpgradeCapId: ".gray, upgradeCapId.blue.bold, "\n");
+    return { packageId, upgradeCapId, upgradeTxn };
   } else {
-    console.log(`Failed to upgrade package at ${packagePath}`.red)
-    return  { packageId: '', upgradeCapId: '', upgradeTxn };
+    console.log(`Failed to upgrade package at ${packagePath}`.red);
+    return { packageId: "", upgradeCapId: "", upgradeTxn };
   }
-}
+};
 
 /**
  * Create a publish package transaction for signing and sending
@@ -106,17 +102,17 @@ export const createUpgradePackageTx = async (
   packagePath: string,
   oldPackageId: string,
   upgradeCapId: string,
-  provider: JsonRpcProvider,
+  client: SuiClient,
   publisher: string,
   options: UpgradeOptions = defaultUpgradeOptions
 ) => {
-  const gasBudget = options.gasBudget || defaultUpgradeOptions.gasBudget as number;
+  const gasBudget = options.gasBudget || (defaultUpgradeOptions.gasBudget as number);
 
   // build the package
   const { modules, dependencies, digest } = buildPackage(suiBinPath, packagePath, options);
 
   // create a transaction block for upgrade package
-  const upgradeTxnBlock = new TransactionBlock();
+  const upgradeTxnBlock = new Transaction();
   // TODO: publish dry run fails currently. Remove this once it's fixed.
   upgradeTxnBlock.setGasBudget(gasBudget);
 
@@ -125,33 +121,30 @@ export const createUpgradePackageTx = async (
     target: `0x2::package::authorize_upgrade`,
     arguments: [
       upgradeTxnBlock.object(upgradeCapId),
-      upgradeTxnBlock.pure(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure(digest)
-    ]
+      upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
+      upgradeTxnBlock.pure.string(digest),
+    ],
   });
 
   // Upgrade the package with the ticket, get the receipt
   const receipt = upgradeTxnBlock.upgrade({
     modules,
     dependencies,
-    packageId: oldPackageId,
-    ticket
+    package: oldPackageId,
+    ticket,
   });
 
   // Commit the upgrade with the receipt
   upgradeTxnBlock.moveCall({
     target: `0x2::package::commit_upgrade`,
-    arguments: [
-      upgradeTxnBlock.object(upgradeCapId),
-      receipt,
-    ]
+    arguments: [upgradeTxnBlock.object(upgradeCapId), receipt],
   });
 
   // set the sender
   upgradeTxnBlock.setSender(publisher);
 
-  const txBytes = await upgradeTxnBlock.build({ provider });
-  const txBytesBase64: string = Buffer.from(txBytes).toString('base64');
+  const txBytes = await upgradeTxnBlock.build({ client });
+  const txBytesBase64: string = Buffer.from(txBytes).toString("base64");
 
-  return { txBytesBase64, tx: upgradeTxnBlock }
-}
+  return { txBytesBase64, tx: upgradeTxnBlock };
+};
