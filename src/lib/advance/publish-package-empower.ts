@@ -1,11 +1,11 @@
 import * as path from "path";
 import * as fs from "fs";
-import { RawSigner } from "@mysten/sui.js";
 import { SuiPackagePublisher } from "../sui-package-publisher";
-import type { NetworkType } from "@scallop-io/sui-kit";
+import type { NetworkType, SuiKit } from "@scallop-io/sui-kit";
 import type { PackagePublishResult } from "../publish-package"
 import { parseMoveToml, writeMoveToml } from "./toml";
 import { writeAsJson } from './write-as-json'
+import { Keypair } from "@mysten/sui/cryptography";
 
 export type PublishResultParser = (publishResult: PackagePublishResult) => Record<string, any>;
 export type PublishPackageOption = {
@@ -21,7 +21,7 @@ export type PublishPackageOption = {
  * Publish the move package and provide options to write toml and save objectIds
  * @param packagePublisher the `SuiPackagePublisher` instance
  * @param pkgPath path to the move package
- * @param signer the `RawSigner` from the @mysten/sui.js
+ * @param suiKit the `SuiKit` instance
  * @param networkType the network type: `testnet` | `mainnet` | 'devnet' | 'localnet'
  * @param option
  *  option.enforce: if true, the package will be published even if it's already published for the networkType
@@ -31,7 +31,7 @@ export type PublishPackageOption = {
 export const publishPackageEmpower = async (
   packagePublisher: SuiPackagePublisher,
   pkgPath: string,
-  signer: RawSigner,
+  suiKit: SuiKit,
   networkType: NetworkType,
   option: PublishPackageOption = { enforce: false, writeToml: false, publishResultParser: undefined }
 ) => {
@@ -42,7 +42,7 @@ export const publishPackageEmpower = async (
   const moveTomlPathForNetworkType = path.join(pkgPath, `Move.${networkType}.toml`);
   const shouldPublish = !fs.existsSync(moveTomlPathForNetworkType) || enforce;
   if (shouldPublish) {
-    const res = await publishPackage(packagePublisher, pkgPath, signer);
+    const res = await publishPackage(packagePublisher, pkgPath, suiKit);
     if (writeToml) {
       writeTomlForNetworkType(pkgPath, res.packageId, networkType);
     }
@@ -62,16 +62,16 @@ export const publishPackageEmpower = async (
  * Publish the package using the `SuiPackagePublisher`
  * @param packagePublisher the `SuiPackagePublisher` instance
  * @param pkgPath path to the move package
- * @param signer the `RawSigner` from the @mysten/sui.js
+ * @param suiKit the `SuiKit` instance
  * @return the `PackagePublishResult` from the `SuiPackagePublisher`
  */
 const publishPackage = async (
   packagePublisher: SuiPackagePublisher,
   pkgPath: string,
-  signer: RawSigner
+  suiKit: SuiKit
 ) => {
   const gasBudget = 10 ** 9;
-  const res = await packagePublisher.publishPackage(pkgPath, signer, {
+  const res = await packagePublisher.publishPackage(pkgPath, suiKit, {
     gasBudget,
     withUnpublishedDependencies: false,
     skipFetchLatestGitDeps: true

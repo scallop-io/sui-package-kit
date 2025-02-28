@@ -1,10 +1,6 @@
 import tmp from 'tmp';
 import 'colorts/lib/string';
 import { execSync } from 'child_process';
-import {
-  ObjectId,
-} from "@mysten/sui.js";
-
 /**
  * Options for build & publish packages
  */
@@ -22,7 +18,7 @@ export const defaultBuildOptions: BuildOptions = {
 
 type BuildPackageResult = {
   modules: string[]; // base64 encoded compiled modules
-  dependencies: ObjectId[]; // dependencies of the package
+  dependencies: string[]; // dependencies of the package
   digest: string; // the package digest
 }
 /**

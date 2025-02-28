@@ -18,6 +18,6 @@ dotenv.config();
     { packagePath: path.join(__dirname, './sample_move/package_a'), option: { enforce: true } }
   ]
 
-  const result = await advancedPublisher.publishPackageBatch(packageBatch, suiKit.getSigner());
+  const result = await advancedPublisher.publishPackageBatch(packageBatch, suiKit);
   console.log(result);
 })();

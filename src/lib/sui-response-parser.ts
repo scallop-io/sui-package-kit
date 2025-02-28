@@ -1,54 +1,56 @@
-// @ts-nocheck
-import {SuiTransactionBlockResponse, getObjectChanges, SuiObjectChange} from "@mysten/sui.js";
+import { SuiObjectChange, SuiTransactionBlockResponse } from "@mysten/sui/client";
 
-export const parsePublishTxn = (suiResponse: SuiTransactionBlockResponse) => {
-  const objectChanges = getObjectChanges(suiResponse);
+export const parsePublishTxn = ({ objectChanges }: SuiTransactionBlockResponse) => {
+  if (!objectChanges) throw new Error("objectChanges is null or undefined");
+
   const parseRes = {
-    packageId: '',
-    upgradeCapId: '',
+    packageId: "",
+    upgradeCapId: "",
     publisherIds: [] as string[],
-    created: [] as { type: string; objectId: string, owner: string }[],
-  }
+    created: [] as { type: string; objectId: string; owner: string }[],
+  };
   if (objectChanges) {
     for (const change of objectChanges) {
-      if (change.type === 'created' && change.objectType.endsWith('package::UpgradeCap')) {
+      if (change.type === "created" && change.objectType.endsWith("package::UpgradeCap")) {
         parseRes.upgradeCapId = change.objectId;
-      } else if (change.type === 'created' && change.objectType.endsWith('package::Publisher')) {
+      } else if (change.type === "created" && change.objectType.endsWith("package::Publisher")) {
         parseRes.publisherIds.push(change.objectId);
-      } else if (change.type === 'published') {
+      } else if (change.type === "published") {
         parseRes.packageId = change.packageId;
-      } else if (change.type === 'created') {
-        const owner = parseOwnerFromObjectChange(change)
+      } else if (change.type === "created") {
+        const owner = parseOwnerFromObjectChange(change);
         parseRes.created.push({ type: change.objectType, objectId: change.objectId, owner });
       }
     }
   }
   return parseRes;
-}
+};
 
-export const parseUpgradeTxn = (suiResponse: SuiTransactionBlockResponse) => {
-  const objectChanges = getObjectChanges(suiResponse);
-  const parseRes = { packageId: '', upgradeCapId: '' };
+export const parseUpgradeTxn = ({ objectChanges }: SuiTransactionBlockResponse) => {
+  if (!objectChanges) throw new Error("objectChanges is null or undefined");
+
+  const parseRes = { packageId: "", upgradeCapId: "" };
   if (objectChanges) {
     for (const change of objectChanges) {
-      if (change.type === 'published') {
+      if (change.type === "published") {
         parseRes.packageId = change.packageId;
-      } else if (change.objectType.endsWith('package::UpgradeCap')) {
+      } else if (change.objectType.endsWith("package::UpgradeCap")) {
         parseRes.upgradeCapId = change.objectId;
       }
     }
   }
   return parseRes;
-}
+};
 
-const parseOwnerFromObjectChange = (change: SuiObjectChange) => {
+const parseOwnerFromObjectChange = (change: SuiObjectChange & { type: "created" }) => {
   const sender = change?.sender;
-  if (change?.owner?.AddressOwner) {
-    return (change.owner.AddressOwner === sender) ? `(you) ${sender}` : change.owner.AddressOwner;
-  } else if (change?.owner?.Shared) {
-    return 'Shared';
-  } else if (change?.owner === 'Immutable') {
-    return 'Immutable';
+  if (typeof change.owner === "object" && "AddressOwner" in change.owner) {
+    return change.owner.AddressOwner === sender ? `(you) ${sender}` : change.owner.AddressOwner;
+  } else if (typeof change.owner === "object" && "Shared" in change.owner) {
+    return "Shared";
+  } else if (typeof change.owner === "object" && "Immutable" in change.owner) {
+    return "Immutable";
+  } else {
+    return "";
   }
-  return '';
-}
+};
