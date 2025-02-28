@@ -11,6 +11,9 @@ importers:
       '@iarna/toml':
         specifier: ^2.2.5
         version: 2.2.5
+      '@mysten/bcs':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@mysten/sui':
         specifier: 1.3.1
         version: 1.3.1(typescript@5.0.4)

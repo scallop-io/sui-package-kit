@@ -4,6 +4,7 @@ import { buildPackage } from "./build-package";
 import { parseUpgradeTxn } from "./sui-response-parser";
 import { SuiClient } from "@mysten/sui/client";
 import { Keypair } from "@mysten/sui/cryptography";
+import { toBase64 } from '@mysten/bcs';
 
 /**
  * Options for upgrade packages
@@ -144,7 +145,7 @@ export const createUpgradePackageTx = async (
   upgradeTxnBlock.setSender(publisher);
 
   const txBytes = await upgradeTxnBlock.build({ client });
-  const txBytesBase64: string = Buffer.from(txBytes).toString("base64");
+  const txBytesBase64: string = toBase64(txBytes);
 
   return { txBytesBase64, tx: upgradeTxnBlock };
 };

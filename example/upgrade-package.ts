@@ -3,7 +3,7 @@
  */
 import * as path from "path";
 import * as dotenv from "dotenv";
-import { fromBase64 } from "@mysten/sui/utils";
+import { fromBase64 } from "@mysten/bcs";
 import { SuiAdvancePackagePublisher } from "../src";
 import { Dependencies } from "../src/lib/advance/upgrade-package-with-dependencies";
 import { SuiKit } from "@scallop-io/sui-kit";
