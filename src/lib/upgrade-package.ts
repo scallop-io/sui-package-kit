@@ -53,12 +53,7 @@ export const upgradePackage = async (
     arguments: [
       upgradeTxnBlock.object(_upgradeCapId),
       upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure(
-        bcs
-          .byteVector()
-          .serialize(new Uint8Array(JSON.parse(digest)))
-          .toBytes()
-      ),
+      upgradeTxnBlock.pure(bcs.byteVector().serialize(new Uint8Array(digest)).toBytes()),
     ],
   });
 
@@ -128,12 +123,7 @@ export const createUpgradePackageTx = async (
     arguments: [
       upgradeTxnBlock.object(upgradeCapId),
       upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure(
-        bcs
-          .byteVector()
-          .serialize(new Uint8Array(JSON.parse(digest)))
-          .toBytes()
-      ),
+      upgradeTxnBlock.pure(bcs.byteVector().serialize(new Uint8Array(digest)).toBytes()),
     ],
   });
 

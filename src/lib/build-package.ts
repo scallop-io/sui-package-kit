@@ -19,7 +19,7 @@ export const defaultBuildOptions: BuildOptions = {
 type BuildPackageResult = {
   modules: string[]; // base64 encoded compiled modules
   dependencies: string[]; // dependencies of the package
-  digest: string; // the package digest
+  digest: Array<number>; // the package digest
 }
 /**
  * builds a package and returns the compiled modules and dependencies
