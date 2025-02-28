@@ -4,7 +4,7 @@ import { buildPackage } from "./build-package";
 import { parseUpgradeTxn } from "./sui-response-parser";
 import { SuiClient } from "@mysten/sui/client";
 import { Keypair } from "@mysten/sui/cryptography";
-import { toBase64 } from '@mysten/bcs';
+import { bcs } from "@mysten/bcs";
 
 /**
  * Options for upgrade packages
@@ -53,7 +53,10 @@ export const upgradePackage = async (
     arguments: [
       upgradeTxnBlock.object(_upgradeCapId),
       upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure.string(digest),
+      bcs
+        .byteVector()
+        .serialize(new Uint8Array(JSON.parse(digest)))
+        .toBytes(),
     ],
   });
 
@@ -123,7 +126,10 @@ export const createUpgradePackageTx = async (
     arguments: [
       upgradeTxnBlock.object(upgradeCapId),
       upgradeTxnBlock.pure.u8(UpgradePolicy.COMPATIBLE),
-      upgradeTxnBlock.pure.string(digest),
+      bcs
+        .byteVector()
+        .serialize(new Uint8Array(JSON.parse(digest)))
+        .toBytes(),
     ],
   });
 
@@ -145,7 +151,7 @@ export const createUpgradePackageTx = async (
   upgradeTxnBlock.setSender(publisher);
 
   const txBytes = await upgradeTxnBlock.build({ client });
-  const txBytesBase64: string = toBase64(txBytes);
+  const txBytesBase64: string = Buffer.from(txBytes).toString("base64");
 
   return { txBytesBase64, tx: upgradeTxnBlock };
 };
