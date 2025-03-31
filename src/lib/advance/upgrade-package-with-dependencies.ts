@@ -24,6 +24,10 @@ export const createUpgradePackageTxWithDependencies = async (
       replaceMoveTomlForNetworkType(dependency.packagePath, networkType);
     });
     return packagePublisher.createUpgradePackageTx(packagePath, oldPackageId, upgradeCapId, client, publisher, options);
+  } catch (e) {
+    dependencies.forEach((dependency) => {
+      replaceMoveTomlForNetworkType(dependency.packagePath, networkType);
+    });
   } finally {
     // After all packages are published, restore the Move.toml file for each package
     dependencies.forEach((dependency) => {
@@ -54,6 +58,6 @@ export const upgradePackageWithDependencies = async (
     networkType,
     options
   );
-  const txBytes = fromB64(tx.txBytesBase64);
+  const txBytes = fromB64(tx!.txBytesBase64);
   return await suiKit.client().signAndExecuteTransaction({ transaction: txBytes, signer: suiKit.getKeypair() });
 };
