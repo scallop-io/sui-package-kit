@@ -48,13 +48,13 @@ export const publishPackage = async (
     modules,
     dependencies,
   });
-  const publisher = publishTxnBlock.pure.address(suiKit.currentAddress());
+  const publisher = publishTxnBlock.pure.address(suiKit.currentAddress);
   publishTxnBlock.transferObjects([upgradeCap], publisher);
 
   // sign and submit the transaction for publishing the package
   console.log(`Start publishing package at ${packagePath}`);
 
-  const publishTxn = await suiKit.client().signAndExecuteTransaction({
+  const publishTxn = await suiKit.client.signAndExecuteTransaction({
     transaction: publishTxnBlock,
     signer: suiKit.getKeypair(),
     options: { showEffects: true, showObjectChanges: true },

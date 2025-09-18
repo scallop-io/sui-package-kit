@@ -24,8 +24,8 @@ dotenv.config();
     oldPkgId,
     upgradeCapId,
     dependencies,
-    suiKit.client(),
-    suiKit.currentAddress()
+    suiKit.client,
+    suiKit.currentAddress
   );
 
   const res = await suiKit.signAndSendTxn(fromBase64(tx.txBytesBase64));

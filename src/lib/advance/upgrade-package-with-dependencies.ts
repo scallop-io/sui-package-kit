@@ -46,18 +46,18 @@ export const upgradePackageWithDependencies = async (
   networkType: NetworkType,
   options?: UpgradeOptions
 ) => {
-  const publisher = suiKit.currentAddress();
+  const publisher = suiKit.currentAddress;
   const tx = await createUpgradePackageTxWithDependencies(
     packagePublisher,
     packagePath,
     oldPackageId,
     upgradeCapId,
     dependencies,
-    suiKit.client(),
+    suiKit.client,
     publisher,
     networkType,
     options
   );
   const txBytes = fromB64(tx!.txBytesBase64);
-  return await suiKit.client().signAndExecuteTransaction({ transaction: txBytes, signer: suiKit.getKeypair() });
+  return await suiKit.client.signAndExecuteTransaction({ transaction: txBytes, signer: suiKit.getKeypair() });
 };
