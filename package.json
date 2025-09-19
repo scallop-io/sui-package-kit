@@ -6,7 +6,9 @@
     "sui",
     "scallop labs",
     "move",
-    "blockchain"
+    "blockchain",
+    "package",
+    "package-kit"
   ],
   "author": "team@scallop.io",
   "homepage": "https://github.com/scallop-io/sui-package-kit#readme",
