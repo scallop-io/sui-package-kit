@@ -2,8 +2,9 @@ import type { NetworkType } from "./network-type";
 import { replaceMoveTomlForNetworkType, restoreMoveToml } from "./toml";
 import { SuiPackagePublisher } from "../sui-package-publisher";
 import { UpgradeOptions } from "../upgrade-package";
-import { SuiClient } from "@mysten/sui/client";
-import { fromB64, SuiKit } from "@scallop-io/sui-kit";
+import type { ClientWithCoreApi } from "@mysten/sui/client";
+import { fromBase64 } from "@mysten/sui/utils";
+import type { SuiKit } from "@scallop-io/sui-kit";
 
 export type Dependencies = { packagePath: string }[];
 
@@ -13,7 +14,7 @@ export const createUpgradePackageTxWithDependencies = async (
   oldPackageId: string,
   upgradeCapId: string,
   dependencies: Dependencies,
-  client: SuiClient,
+  client: ClientWithCoreApi,
   publisher: string,
   networkType: NetworkType,
   options?: UpgradeOptions
@@ -58,6 +59,6 @@ export const upgradePackageWithDependencies = async (
     networkType,
     options
   );
-  const txBytes = fromB64(tx!.txBytesBase64);
-  return await suiKit.client.signAndExecuteTransaction({ transaction: txBytes, signer: suiKit.getKeypair() });
+  const txBytes = fromBase64(tx!.txBytesBase64);
+  return await suiKit.client.core.signAndExecuteTransaction({ transaction: txBytes, signer: suiKit.getKeypair() });
 };

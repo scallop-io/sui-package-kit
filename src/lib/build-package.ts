@@ -1,5 +1,5 @@
 import tmp from 'tmp';
-import 'colorts/lib/string';
+import 'colorts/lib/string.js';
 import { execSync } from 'child_process';
 /**
  * Options for build & publish packages

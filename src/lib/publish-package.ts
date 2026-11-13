@@ -1,8 +1,9 @@
-import "colorts/lib/string";
-import { parsePublishTxn } from "./sui-response-parser";
+import "colorts/lib/string.js";
+import { ExecutedTransaction, executeInclude, parsePublishTxn, unwrapResult } from "./sui-response-parser";
 import { BuildOptions, defaultBuildOptions, buildPackage } from "./build-package";
-import { SuiClient, SuiTransactionBlockResponse } from "@mysten/sui/client";
-import { SuiKit, Transaction } from "@scallop-io/sui-kit";
+import type { ClientWithCoreApi } from "@mysten/sui/client";
+import { Transaction } from "@mysten/sui/transactions";
+import type { SuiKit } from "@scallop-io/sui-kit";
 
 export type PublishOptions = BuildOptions & {
   // The gas budget for the publish transaction
@@ -18,7 +19,7 @@ export type PackagePublishResult = {
   upgradeCapId: string;
   publisherIds: string[];
   created: { type: string; objectId: string; owner: string }[];
-  publishTxn: SuiTransactionBlockResponse;
+  publishTxn: ExecutedTransaction;
 };
 /**
  * Publishes a package to the SUI blockchain, and returns the packageId and publish txn response
@@ -54,15 +55,17 @@ export const publishPackage = async (
   // sign and submit the transaction for publishing the package
   console.log(`Start publishing package at ${packagePath}`);
 
-  const publishTxn = await suiKit.client.signAndExecuteTransaction({
-    transaction: publishTxnBlock,
-    signer: suiKit.getKeypair(),
-    options: { showEffects: true, showObjectChanges: true },
-  });
+  const publishTxn = unwrapResult(
+    await suiKit.client.core.signAndExecuteTransaction({
+      transaction: publishTxnBlock,
+      signer: suiKit.getKeypair(),
+      include: executeInclude,
+    })
+  );
 
-  // If the publish transaction is successful, retrieve the packageId from the 'publish' event
+  // If the publish transaction is successful, retrieve the packageId from the changed objects
   // Otherwise, return empty data
-  if (publishTxn.effects?.status.status === "success") {
+  if (publishTxn.status.success) {
     const { packageId, upgradeCapId, publisherIds, created } = parsePublishTxn(publishTxn);
     console.log("Successfully published package\n".green);
     console.log("==============Created objects==============".gray);
@@ -92,7 +95,7 @@ export const publishPackage = async (
 export const createPublishTx = async (
   suiBinPath: string,
   packagePath: string,
-  client: SuiClient,
+  client: ClientWithCoreApi,
   publisher: string,
   options: PublishOptions = defaultPublishOptions
 ) => {
@@ -115,6 +118,8 @@ export const createPublishTx = async (
 
   // set the sender
   publishTxnBlock.setSender(publisher);
+  // keep the pre-v2 behavior: no expiration, so the bytes can be signed later (e.g. multisig)
+  publishTxnBlock.setExpiration({ None: true });
 
   const txBytes = await publishTxnBlock.build({ client });
   const txBytesBase64 = Buffer.from(txBytes).toString("base64");

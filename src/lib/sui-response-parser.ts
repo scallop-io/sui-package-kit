@@ -1,56 +1,70 @@
-import { SuiObjectChange, SuiTransactionBlockResponse } from "@mysten/sui/client";
+import type { SuiClientTypes } from "@mysten/sui/client";
 
-export const parsePublishTxn = ({ objectChanges }: SuiTransactionBlockResponse) => {
-  if (!objectChanges) throw new Error("objectChanges is null or undefined");
+/**
+ * What `client.core.signAndExecuteTransaction` must include, so the parsers below can read the result
+ */
+export const executeInclude = { effects: true, objectTypes: true, transaction: true } as const;
 
+export type ExecutedTransaction = SuiClientTypes.Transaction<typeof executeInclude>;
+export type ExecuteResult = SuiClientTypes.TransactionResult<typeof executeInclude>;
+
+/**
+ * A failed transaction does not throw, it comes back under `FailedTransaction`
+ */
+export const unwrapResult = (res: ExecuteResult): ExecutedTransaction =>
+  res.$kind === "Transaction" ? res.Transaction : res.FailedTransaction;
+
+export const parsePublishTxn = ({ effects, objectTypes, transaction }: ExecutedTransaction) => {
   const parseRes = {
     packageId: "",
     upgradeCapId: "",
     publisherIds: [] as string[],
     created: [] as { type: string; objectId: string; owner: string }[],
   };
-  if (objectChanges) {
-    for (const change of objectChanges) {
-      if (change.type === "created" && change.objectType.endsWith("package::UpgradeCap")) {
-        parseRes.upgradeCapId = change.objectId;
-      } else if (change.type === "created" && change.objectType.endsWith("package::Publisher")) {
-        parseRes.publisherIds.push(change.objectId);
-      } else if (change.type === "published") {
-        parseRes.packageId = change.packageId;
-      } else if (change.type === "created") {
-        const owner = parseOwnerFromObjectChange(change);
-        parseRes.created.push({ type: change.objectType, objectId: change.objectId, owner });
-      }
+  for (const change of effects.changedObjects) {
+    if (change.idOperation !== "Created") continue;
+    if (change.outputState === "PackageWrite") {
+      parseRes.packageId = change.objectId;
+      continue;
+    }
+    const type = objectTypes[change.objectId] ?? "";
+    if (type.endsWith("package::UpgradeCap")) {
+      parseRes.upgradeCapId = change.objectId;
+    } else if (type.endsWith("package::Publisher")) {
+      parseRes.publisherIds.push(change.objectId);
+    } else {
+      const owner = parseOwner(change.outputOwner, transaction.sender ?? "");
+      parseRes.created.push({ type, objectId: change.objectId, owner });
     }
   }
   return parseRes;
 };
 
-export const parseUpgradeTxn = ({ objectChanges }: SuiTransactionBlockResponse) => {
-  if (!objectChanges) throw new Error("objectChanges is null or undefined");
-
+export const parseUpgradeTxn = ({ effects, objectTypes }: ExecutedTransaction) => {
   const parseRes = { packageId: "", upgradeCapId: "" };
-  if (objectChanges) {
-    for (const change of objectChanges) {
-      if (change.type === "published") {
-        parseRes.packageId = change.packageId;
-      } else if (change.objectType.endsWith("package::UpgradeCap")) {
-        parseRes.upgradeCapId = change.objectId;
-      }
+  for (const change of effects.changedObjects) {
+    if (change.idOperation === "Created" && change.outputState === "PackageWrite") {
+      parseRes.packageId = change.objectId;
+    } else if ((objectTypes[change.objectId] ?? "").endsWith("package::UpgradeCap")) {
+      parseRes.upgradeCapId = change.objectId;
     }
   }
   return parseRes;
 };
 
-const parseOwnerFromObjectChange = (change: SuiObjectChange & { type: "created" }) => {
-  const sender = change?.sender;
-  if (typeof change.owner === "object" && "AddressOwner" in change.owner) {
-    return change.owner.AddressOwner === sender ? `(you) ${sender}` : change.owner.AddressOwner;
-  } else if (typeof change.owner === "object" && "Shared" in change.owner) {
-    return "Shared";
-  } else if (typeof change.owner === "object" && "Immutable" in change.owner) {
-    return "Immutable";
-  } else {
-    return "";
+const parseOwner = (owner: SuiClientTypes.ObjectOwner | null, sender: string) => {
+  switch (owner?.$kind) {
+    case "AddressOwner":
+      return owner.AddressOwner === sender ? `(you) ${sender}` : owner.AddressOwner;
+    case "ConsensusAddressOwner":
+      return owner.ConsensusAddressOwner.owner === sender
+        ? `(you) ${sender}`
+        : owner.ConsensusAddressOwner.owner;
+    case "Shared":
+      return "Shared";
+    case "Immutable":
+      return "Immutable";
+    default:
+      return "";
   }
 };

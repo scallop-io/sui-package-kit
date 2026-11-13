@@ -1,6 +1,6 @@
 {
   "name": "@scallop-io/sui-package-kit",
-  "version": "1.21.3",
+  "version": "2.0.0",
   "description": "Toolkit for publish/upgrade/build SUI packages",
   "keywords": [
     "sui",
@@ -23,7 +23,7 @@
     "src"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=22.12"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -43,23 +43,28 @@
     "clean": "rm -rf tsconfig.tsbuildinfo ./dist",
     "build": "npm run build:types && npm run build:tsup",
     "build:tsup": "tsup ./src/index.ts --format esm,cjs --sourcemap",
-    "build:types": "tsc --build"
+    "build:types": "tsc --build",
+    "test": "vitest run"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@mysten/bcs": "^1.4.0",
-    "@mysten/sui": "1.28.2",
     "colorts": "^0.1.63",
     "superstruct": "^1.0.3",
     "tmp": "^0.2.1"
   },
+  "peerDependencies": {
+    "@mysten/sui": "^2.22.0",
+    "@scallop-io/sui-kit": "^3.0.0"
+  },
   "devDependencies": {
-    "@scallop-io/sui-kit": "^1.4.0",
-    "@types/node": "^20.1.5",
+    "@mysten/sui": "2.39.1",
+    "@scallop-io/sui-kit": "^3.0.0",
+    "@types/node": "^22.0.0",
     "@types/tmp": "^0.2.3",
     "dotenv": "^16.0.3",
     "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
   }
 }

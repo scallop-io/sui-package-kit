@@ -17,12 +17,13 @@ jobs:
           version: 9.12.3
       - uses: actions/setup-node@v3.6.0
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
           scope: '@scallop-io'
       - run: |
           pnpm install --frozen-lockfile
+          pnpm test
           pnpm run build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
@@ -41,7 +42,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - uses: actions/setup-node@v3.6.0
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@scallop-io'

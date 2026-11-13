@@ -7,8 +7,8 @@ import {
   upgradePackageWithDependencies,
 } from "./upgrade-package-with-dependencies";
 import { UpgradeOptions } from "../upgrade-package";
-import { SuiKit } from "@scallop-io/sui-kit";
-import { SuiClient } from "@mysten/sui/client";
+import type { SuiKit } from "@scallop-io/sui-kit";
+import type { ClientWithCoreApi } from "@mysten/sui/client";
 
 /**
  * This is an advance version of the `SuiPackagePublisher` class
@@ -81,7 +81,7 @@ export class SuiAdvancePackagePublisher {
     oldPackageId: string,
     upgradeCapId: string,
     dependencies: { packagePath: string }[],
-    client: SuiClient,
+    client: ClientWithCoreApi,
     publisher: string,
     options?: UpgradeOptions
   ) {
