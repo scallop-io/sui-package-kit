@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": ["node"],
     "allowJs": true,
     "baseUrl": ".",
     // output .d.ts declaration files for consumers
@@ -16,14 +17,13 @@
     // match output dir to input dir. e.g. dist/index instead of dist/src/index
     "rootDir": "src",
     "outDir": "dist",
-    "preserveSymlinks": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": false,
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -32,6 +32,7 @@
   "exclude": [
     "node_modules",
     "example",
+    "test",
     "dist",
   ]
 }

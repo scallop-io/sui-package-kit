@@ -1,10 +1,10 @@
-import "colorts/lib/string";
-import { Transaction, UpgradePolicy } from "@scallop-io/sui-kit";
+import "colorts/lib/string.js";
+import { Transaction, UpgradePolicy } from "@mysten/sui/transactions";
 import { buildPackage } from "./build-package";
-import { parseUpgradeTxn } from "./sui-response-parser";
-import { SuiClient } from "@mysten/sui/client";
-import { Keypair } from "@mysten/sui/cryptography";
-import { bcs } from "@mysten/bcs";
+import { executeInclude, parseUpgradeTxn, unwrapResult } from "./sui-response-parser";
+import type { ClientWithCoreApi } from "@mysten/sui/client";
+import type { Keypair } from "@mysten/sui/cryptography";
+import { bcs } from "@mysten/sui/bcs";
 
 /**
  * Options for upgrade packages
@@ -33,7 +33,7 @@ export const upgradePackage = async (
   packagePath: string,
   oldPackageId: string,
   _upgradeCapId: string,
-  client: SuiClient,
+  client: ClientWithCoreApi,
   keyPair: Keypair,
   options: UpgradeOptions = defaultUpgradeOptions
 ) => {
@@ -73,14 +73,16 @@ export const upgradePackage = async (
 
   // sign and submit the transaction for upgrading the package
   console.log(`Start upgrading package at ${packagePath}`.cyan);
-  const upgradeTxn = await client.signAndExecuteTransaction({
-    transaction: upgradeTxnBlock,
-    signer: keyPair,
-    options: { showEffects: true, showObjectChanges: true },
-  });
-  // If the upgrade transaction is successful, retrieve the packageId from the 'upgrade' event
+  const upgradeTxn = unwrapResult(
+    await client.core.signAndExecuteTransaction({
+      transaction: upgradeTxnBlock,
+      signer: keyPair,
+      include: executeInclude,
+    })
+  );
+  // If the upgrade transaction is successful, retrieve the packageId from the changed objects
   // Otherwise, return empty data
-  if (upgradeTxn.effects?.status.status === "success") {
+  if (upgradeTxn.status.success) {
     const { packageId, upgradeCapId } = parseUpgradeTxn(upgradeTxn);
     console.log(`Successfully upgraded package at ${packagePath}`.green);
     console.log("==============Package info==============".gray);
@@ -103,7 +105,7 @@ export const createUpgradePackageTx = async (
   packagePath: string,
   oldPackageId: string,
   upgradeCapId: string,
-  client: SuiClient,
+  client: ClientWithCoreApi,
   publisher: string,
   options: UpgradeOptions = defaultUpgradeOptions
 ) => {
@@ -143,6 +145,8 @@ export const createUpgradePackageTx = async (
 
   // set the sender
   upgradeTxnBlock.setSender(publisher);
+  // keep the pre-v2 behavior: no expiration, so the bytes can be signed later (e.g. multisig)
+  upgradeTxnBlock.setExpiration({ None: true });
 
   const txBytes = await upgradeTxnBlock.build({ client });
   const txBytesBase64: string = Buffer.from(txBytes).toString("base64");

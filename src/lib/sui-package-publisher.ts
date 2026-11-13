@@ -1,15 +1,15 @@
 import {createPublishTx, PublishOptions, publishPackage} from "./publish-package";
 import {upgradePackage, UpgradeOptions, createUpgradePackageTx} from "./upgrade-package"
 import { buildPackage, BuildOptions } from "./build-package"
-import { SuiClient } from "@mysten/sui/client";
-import { SuiKit } from "@scallop-io/sui-kit";
-import { Keypair } from "@mysten/sui/cryptography";
+import type { ClientWithCoreApi } from "@mysten/sui/client";
+import type { SuiKit } from "@scallop-io/sui-kit";
+import type { Keypair } from "@mysten/sui/cryptography";
 
 type UpgradeParams = {
   packagePath: string,
   oldPackageId: string,
   upgradeCapId: string,
-  client: SuiClient,
+  client: ClientWithCoreApi,
   keyPair: Keypair
   options?: UpgradeOptions
 }
@@ -45,7 +45,7 @@ export class SuiPackagePublisher {
    * @param options, the options for building the transaction
    * @returns the base64 encoded transaction bytes, and the transaction block
    */
-  async createPulishPackageTx(packagePath: string, client: SuiClient, publisher: string, options?: PublishOptions) {
+  async createPulishPackageTx(packagePath: string, client: ClientWithCoreApi, publisher: string, options?: PublishOptions) {
     return createPublishTx(this.suiBin, packagePath, client, publisher, options);
   }
 
@@ -81,7 +81,7 @@ export class SuiPackagePublisher {
     packagePath: string,
     oldPackageId: string,
     upgradeCapId: string,
-    client: SuiClient,
+    client: ClientWithCoreApi,
     publisher: string,
     options?: UpgradeOptions
   ) {
